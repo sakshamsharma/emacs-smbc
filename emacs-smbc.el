@@ -34,32 +34,10 @@
 ;; Currently not doing that since it will make it hard to adapt
 ;; for a comic which does not have such a feed
 
-(defun getSMBCindexPage ()
-  "Retrieve a part of the index page of SMBC"
+(defun getLatestSMBC ()
+  "Get latest SMBC comic and display in new buffer"
   (interactive)
-  (let ((buffer (url-retrieve-synchronously
-                 "http://smbc-comics.com")))
-    (with-current-buffer buffer
-      (goto-char (point-min))
-      (search-forward "comics/../comics")
-      (thing-at-point 'line)
-      )))
-
-(defun chomp (str)
-  "Chomp leading and tailing whitespace from STR."
-  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
-                       str)
-    (setq str (replace-match "" t t str)))
-  str)
-
-(defun parseHTMLforImageSMBC (htmlPage)
-  "Parse the input HTML for the comic image url"
-  (chomp (let ((index (getSMBCindexPage)))
-           (replace-regexp-in-string
-            "\" id=\"comic.*" ""
-            (replace-regexp-in-string
-             ".*src=\"comics/\.\./" "" index))
-           )))
+  (getSMBCimage (parseHTMLforImageSMBC (getSMBCindexPage))))
 
 (defun getSMBCimage (imageID)
   "Retrieve and display image placed at SMBC."
@@ -74,9 +52,31 @@
           (insert-image (create-image data nil t))))
       )))
 
-(defun getLatestSMBC ()
-  "Get latest SMBC comic and display in new buffer"
-  (getSMBCimage (parseHTMLforImageSMBC (getSMBCindexPage))))
+(defun parseHTMLforImageSMBC (htmlPage)
+  "Parse the input HTML for the comic image url"
+  (chomp (let ((index (getSMBCindexPage)))
+           (replace-regexp-in-string
+            "\" id=\"comic.*" ""
+            (replace-regexp-in-string
+             ".*src=\"comics/\.\./" "" index))
+           )))
+
+(defun getSMBCindexPage ()
+  "Retrieve a part of the index page of SMBC"
+  (let ((buffer (url-retrieve-synchronously
+                 "http://smbc-comics.com")))
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (search-forward "comics/../comics")
+      (thing-at-point 'line)
+      )))
+
+(defun chomp (str)
+  "Chomp leading and tailing whitespace from STR."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                       str)
+    (setq str (replace-match "" t t str)))
+  str)
 
 (provide 'emacs-smbc)
 ;;; emacs-smbc.el ends here
