@@ -37,7 +37,7 @@
 (defun get-latest-smbc ()
   "Get latest SMBC comic and display in new buffer"
   (interactive)
-  (get-smbc-image (parse-html-for-smbc (get-smbc-index-page))))
+  (get-smbc-image (parse-html-for-smbc)))
 
 (defun get-smbc-image (imageID)
   "Retrieve and display image placed at SMBC."
@@ -52,7 +52,7 @@
           (insert-image (create-image data nil t))))
       )))
 
-(defun parse-html-for-smbc (htmlPage)
+(defun parse-html-for-smbc ()
   "Parse the input HTML for the comic image url"
   (chomp (let ((index (get-smbc-index-page)))
            (replace-regexp-in-string
