@@ -19,4 +19,5 @@ Access the latest comic with `M-x get-latest-smbc`.
 * Allow reading previous comics as well
 * Cache last few comics
 * Allow opening comic in browser
+* Use RSS feed instead of parsing HTML
 * Read some more SMBC :smile:
