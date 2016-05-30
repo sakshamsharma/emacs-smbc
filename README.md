@@ -8,10 +8,10 @@ Emacs-SMBC is a plugin to help you (Save the world? Sadly no) read SMBC without 
 It is planned to have a lot of functions to make reading SMBC easier.
 
 ### Usage
-Simply load the file (place it in your `.emacs.d` and load it, or else use `M-x load-file` and give its path).
+Simply load the file (place it in your `.emacs.d` and load it, or else use `M-x load-file` and give its path).<br>
 Better still, add it to your `init.el`, it's easy and fast to load.
 
-Access the latest comic with `M-x getLatestSMBC`.
+Access the latest comic with `M-x get-latest-smbc`.
 
 ### TODO
 
