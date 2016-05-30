@@ -34,12 +34,12 @@
 ;; Currently not doing that since it will make it hard to adapt
 ;; for a comic which does not have such a feed
 
-(defun getLatestSMBC ()
+(defun get-latest-smbc ()
   "Get latest SMBC comic and display in new buffer"
   (interactive)
-  (getSMBCimage (parseHTMLforImageSMBC (getSMBCindexPage))))
+  (get-smbc-image (parse-html-for-smbc (get-smbc-index-page))))
 
-(defun getSMBCimage (imageID)
+(defun get-smbc-image (imageID)
   "Retrieve and display image placed at SMBC."
   (with-help-window "SMBC"
     (with-current-buffer "SMBC"
@@ -52,16 +52,16 @@
           (insert-image (create-image data nil t))))
       )))
 
-(defun parseHTMLforImageSMBC (htmlPage)
+(defun parse-html-for-smbc (htmlPage)
   "Parse the input HTML for the comic image url"
-  (chomp (let ((index (getSMBCindexPage)))
+  (chomp (let ((index (get-smbc-index-page)))
            (replace-regexp-in-string
             "\" id=\"comic.*" ""
             (replace-regexp-in-string
              ".*src=\"comics/\.\./" "" index))
            )))
 
-(defun getSMBCindexPage ()
+(defun get-smbc-index-page ()
   "Retrieve a part of the index page of SMBC"
   (let ((buffer (url-retrieve-synchronously
                  "http://smbc-comics.com")))
