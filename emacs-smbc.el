@@ -35,41 +35,38 @@
 ;; for a comic which does not have such a feed
 
 (defun get-latest-smbc ()
-  "Get latest SMBC comic and display in new buffer"
+  "Get latest SMBC comic and display in new buffer."
   (interactive)
   (get-smbc-image (parse-html-for-smbc)))
 
-(defun get-smbc-image (imageID)
-  "Retrieve and display image placed at SMBC."
+(defun get-smbc-image (image-id)
+  "Retrieve and display image placed at SMBC with given IMAGE-ID."
   (with-help-window "SMBC"
     (with-current-buffer "SMBC"
       (let ((buffer (url-retrieve-synchronously
-                     (concat "http://smbc-comics.com/" imageID))))
+                     (concat "http://smbc-comics.com/" image-id))))
         (let ((data (with-current-buffer buffer
                       (goto-char (point-min))
                       (search-forward "\n\n")
                       (buffer-substring (point) (point-max)))))
-          (insert-image (create-image data nil t))))
-      )))
+          (insert-image (create-image data nil t)))))))
 
 (defun parse-html-for-smbc ()
-  "Parse the input HTML for the comic image url"
+  "Parse the input HTML for the comic image url."
   (chomp (let ((index (get-smbc-index-page)))
            (replace-regexp-in-string
             "\" id=\"comic.*" ""
             (replace-regexp-in-string
-             ".*src=\"comics/\.\./" "" index))
-           )))
+             ".*src=\"comics/\.\./" "" index)))))
 
 (defun get-smbc-index-page ()
-  "Retrieve a part of the index page of SMBC"
+  "Retrieve a part of the index page of SMBC."
   (let ((buffer (url-retrieve-synchronously
                  "http://smbc-comics.com")))
     (with-current-buffer buffer
       (goto-char (point-min))
       (search-forward "comics/../comics")
-      (thing-at-point 'line)
-      )))
+      (thing-at-point 'line))))
 
 (defun chomp (str)
   "Chomp leading and tailing whitespace from STR."
