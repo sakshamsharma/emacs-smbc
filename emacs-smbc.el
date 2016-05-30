@@ -31,6 +31,8 @@
 (require 'url)
 
 ;; TODO Shift to using an XML parser for rss.php file of smbc
+;; Currently not doing that since it will make it hard to adapt
+;; for a comic which does not have such a feed
 
 (defun getSMBCindexPage ()
   "Retrieve a part of the index page of SMBC"
@@ -50,9 +52,9 @@
     (setq str (replace-match "" t t str)))
   str)
 
-(defun parseIndex ()
+(defun parseHTMLforImageSMBC (htmlPage)
   "Parse the input HTML for the comic image url"
-  (chomp (let ((index (getSMBCindex)))
+  (chomp (let ((index (getSMBCindexPage)))
            (replace-regexp-in-string
             "\" id=\"comic.*" ""
             (replace-regexp-in-string
@@ -74,7 +76,7 @@
 
 (defun getLatestSMBC ()
   "Get latest SMBC comic and display in new buffer"
-  (getSMBCimage (parseIndex)))
+  (getSMBCimage (parseHTMLforImageSMBC (getSMBCindexPage))))
 
 (provide 'emacs-smbc)
 ;;; emacs-smbc.el ends here
