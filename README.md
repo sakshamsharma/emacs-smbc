@@ -13,6 +13,9 @@ Better still, add it to your `init.el`, it's easy and fast to load.
 
 Access the latest comic with `M-x get-latest-smbc`.
 
+### Misc
+Reddit discussion [here](https://www.reddit.com/r/emacs/comments/4lrjln/a_simple_smbc_viewer_for_emacs/)
+
 ### TODO
 
 * Check for new comics every time on startup
