@@ -1,15 +1,15 @@
-;;; emacs-smbc.el --- View SMBC from Emacs
+;;; smbc.el --- View SMBC from Emacs
 
 ;;; Copyright (C) 2016 Saksham Sharma <saksham0808@gmail.com>
 
-;; Url: https://github.com/sakshamsharma/emacs-smbc
+;; Url: https://github.com/sakshamsharma/smbc
 ;; Author: Saksham Sharma <saksham0808@gmail.com>
 ;; Version: 1.0
 ;; Keywords: smbc webcomic
 
 ;;; Commentary:
 
-;; For more information, visit https://github.com/sakshamsharma/emacs-smbc
+;; For more information, visit https://github.com/sakshamsharma/smbc
 ;; This file is not a part of GNU Emacs.
 
 ;;; License:
@@ -34,12 +34,12 @@
 ;; Currently not doing that since it will make it hard to adapt
 ;; for a comic which does not have such a feed
 
-(defun get-latest-smbc ()
+(defun smbc-get-latest ()
   "Get latest SMBC comic and display in new buffer."
   (interactive)
-  (get-smbc-image (parse-html-for-smbc)))
+  (smbc-get-image (smbc-parse-html)))
 
-(defun get-smbc-image (image-id)
+(defun smbc-get-image (image-id)
   "Retrieve and display image placed at SMBC with given IMAGE-ID."
   (with-help-window "SMBC"
     (with-current-buffer "SMBC"
@@ -51,15 +51,15 @@
                       (buffer-substring (point) (point-max)))))
           (insert-image (create-image data nil t)))))))
 
-(defun parse-html-for-smbc ()
+(defun smbc-parse-html ()
   "Parse the input HTML for the comic image url."
-  (chomp (let ((index (get-smbc-index-page)))
-           (replace-regexp-in-string
-            "\" id=\"comic.*" ""
-            (replace-regexp-in-string
-             ".*src=\"comics/\.\./" "" index)))))
+  (smbc-chomp (let ((index (smbc-get-index-page)))
+                (replace-regexp-in-string
+                 "\" id=\"comic.*" ""
+                 (replace-regexp-in-string
+                  ".*src=\"comics/\.\./" "" index)))))
 
-(defun get-smbc-index-page ()
+(defun smbc-get-index-page ()
   "Retrieve a part of the index page of SMBC."
   (let ((buffer (url-retrieve-synchronously
                  "http://smbc-comics.com")))
@@ -68,12 +68,12 @@
       (search-forward "comics/../comics")
       (thing-at-point 'line))))
 
-(defun chomp (str)
+(defun smbc-chomp (str)
   "Chomp leading and tailing whitespace from STR."
   (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
                        str)
     (setq str (replace-match "" t t str)))
   str)
 
-(provide 'emacs-smbc)
-;;; emacs-smbc.el ends here
+(provide 'smbc)
+;;; smbc.el ends here
