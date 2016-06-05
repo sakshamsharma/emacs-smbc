@@ -46,16 +46,18 @@
 
 (defun smbc-get-image (image-id)
   "Retrieve, display image placed at SMBC with given IMAGE-ID."
-  (get-buffer-create "SMBC")
-  (switch-to-buffer-other-window "SMBC")
-  (let ((buffer (url-retrieve-synchronously
-                 (concat "http://smbc-comics.com/" image-id))))
-    (let ((data (with-current-buffer buffer
-                  (goto-char (point-min))
-                  (search-forward "\n\n")
-                  (buffer-substring (point) (point-max)))))
-      (insert-image (create-image data nil t))))
-  (special-mode))
+  (let ((smbc-buffer-name (generate-new-buffer-name "SMBC")))
+    (get-buffer-create smbc-buffer-name)
+    (switch-to-buffer-other-window smbc-buffer-name)
+    (read-only-mode 0)
+    (let ((buffer (url-retrieve-synchronously
+                   (concat "http://smbc-comics.com/" image-id))))
+      (let ((data (with-current-buffer buffer
+                    (goto-char (point-min))
+                    (search-forward "\n\n")
+                    (buffer-substring (point) (point-max)))))
+        (insert-image (create-image data nil t))))
+    (special-mode)))
 
 (defun smbc-parse-html ()
   "Parse the input HTML for the comic image url."
