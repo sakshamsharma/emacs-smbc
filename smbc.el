@@ -2,14 +2,14 @@
 
 ;;; Copyright (C) 2016 Saksham Sharma <saksham0808@gmail.com>
 
-;; Url: https://github.com/sakshamsharma/smbc
+;; Url: https://github.com/sakshamsharma/emacs-smbc
 ;; Author: Saksham Sharma <saksham0808@gmail.com>
 ;; Version: 1.0
 ;; Keywords: smbc webcomic
 
 ;;; Commentary:
 
-;; For more information, visit https://github.com/sakshamsharma/smbc
+;; For more information, visit https://github.com/sakshamsharma/emacs-smbc
 ;; This file is not a part of GNU Emacs.
 
 ;;; License:
