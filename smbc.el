@@ -41,8 +41,9 @@
 
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
-  (interactive)
-  (smbc-get-image (image-id)))
+  (interactive
+   (list (read-string "Image ID: ")))
+  (smbc-get-image image-id))
 
 (defun smbc-get-image (image-id)
   "Retrieve, display image placed at SMBC with given IMAGE-ID."
