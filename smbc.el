@@ -37,7 +37,7 @@
 (defun smbc-get-latest ()
   "Get latest SMBC comic and display in new buffer."
   (interactive)
-  (smbc-get-image (smbc-parse-html)))
+  (smbc-get-image (smbc-parse-html (smbc-get-index-page))))
 
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
@@ -60,9 +60,9 @@
         (insert-image (create-image data nil t))))
     (special-mode)))
 
-(defun smbc-parse-html ()
-  "Parse the input HTML for the comic image url."
-  (smbc-chomp (let ((index (smbc-get-index-page)))
+(defun smbc-parse-html (html-page)
+  "Parse the input HTML-PAGE for the comic image url."
+  (smbc-chomp (let ((index html-page))
                 (replace-regexp-in-string
                  "\" id=\"comic.*" ""
                  (replace-regexp-in-string
@@ -72,6 +72,15 @@
   "Retrieve a part of the index page of SMBC."
   (let ((buffer (url-retrieve-synchronously
                  "http://smbc-comics.com")))
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (search-forward "comics/../comics")
+      (thing-at-point 'line))))
+
+(defun smbc-get-page-given-id (id)
+  "Retrieve part of a page with given ID to be used as a GET parameter."
+  (let ((buffer (url-retrieve-synchronously
+                 (concat "http://smbc-comics.com/index.php?id=" id))))
     (with-current-buffer buffer
       (goto-char (point-min))
       (search-forward "comics/../comics")
