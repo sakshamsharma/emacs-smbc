@@ -14,6 +14,7 @@ Better still, add it to your `init.el`, it's easy and fast to load.
 Access the latest comic with `M-x smbc-get-latest`.
 
 ### Misc
+On MELPA as `smbc` [here](https://github.com/sakshamsharma/melpa/blob/master/recipes/smbc)
 Reddit discussion [here](https://www.reddit.com/r/emacs/comments/4lrjln/a_simple_smbc_viewer_for_emacs/)
 
 ### TODO
