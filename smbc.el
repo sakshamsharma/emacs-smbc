@@ -37,7 +37,7 @@
 (defun smbc-get-latest ()
   "Get latest SMBC comic and display in new buffer."
   (interactive)
-  (smbc-get-image (smbc-parse-html (smbc-get-index-page))))
+  (smbc-display-image (smbc-get-image-data (smbc-parse-html (smbc-get-index-page)))))
 
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
@@ -45,19 +45,22 @@
    (list (read-string "Image ID (smbc-comics.com/): ")))
   (smbc-get-image image-id))
 
-(defun smbc-get-image (image-id)
-  "Retrieve, display image placed at SMBC with given IMAGE-ID."
+(defun smbc-get-image-data (image-id)
+  "Retrieve image data from smbc-comics.com/IMAGE-ID."
+  (let ((buffer (url-retrieve-synchronously
+                 (concat "http://smbc-comics.com/" image-id))))
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (search-forward "\n\n")
+      (buffer-substring (point) (point-max)))))
+
+(defun smbc-display-image (image-data)
+  "Display IMAGE-DATA in buffer."
   (let ((smbc-buffer-name (generate-new-buffer-name "SMBC")))
     (get-buffer-create smbc-buffer-name)
     (switch-to-buffer-other-window smbc-buffer-name)
     (read-only-mode 0)
-    (let ((buffer (url-retrieve-synchronously
-                   (concat "http://smbc-comics.com/" image-id))))
-      (let ((data (with-current-buffer buffer
-                    (goto-char (point-min))
-                    (search-forward "\n\n")
-                    (buffer-substring (point) (point-max)))))
-        (insert-image (create-image data nil t))))
+    (insert-image (create-image image-data nil t))
     (special-mode)))
 
 (defun smbc-parse-html (html-page)
