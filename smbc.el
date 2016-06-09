@@ -39,6 +39,13 @@
   (interactive)
   (smbc-display-image (smbc-get-image-data (smbc-parse-html (smbc-get-index-page)))))
 
+(defun smbc-get-older ()
+  "Get a previous SMBC comic and display in BUFFER-NAME."
+  (interactive)
+  (smbc-display-in-buffer
+   (smbc-get-image-data
+    (smbc-parse-html (smbc-get-page-given-id "4134"))) smbc-buffer-name))
+
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
   (interactive
@@ -55,13 +62,24 @@
       (buffer-substring (point) (point-max)))))
 
 (defun smbc-display-image (image-data)
-  "Display IMAGE-DATA in buffer."
-  (let ((smbc-buffer-name (generate-new-buffer-name "SMBC")))
-    (get-buffer-create smbc-buffer-name)
-    (switch-to-buffer-other-window smbc-buffer-name)
-    (read-only-mode 0)
-    (insert-image (create-image image-data nil t))
-    (special-mode)))
+  "Create new buffer for IMAGE-DATA and then display."
+  (let ((buffer-name (generate-new-buffer-name "SMBC")))
+    (get-buffer-create buffer-name)
+    (smbc-display-in-buffer image-data buffer-name)))
+
+(defun smbc-display-in-buffer (image-data buffer-name)
+  "Display given IMAGE-DATA in a buffer named BUFFER-NAME."
+  (setq smbc-buffer-name buffer-name)
+  ;; If currently in same buffer, don't open a new one
+  (if (equal (buffer-name) buffer-name)
+      (switch-to-buffer buffer-name)
+    (switch-to-buffer-other-window buffer-name))
+  (read-only-mode 0)
+  (erase-buffer)
+  (insert-image (create-image image-data nil t))
+  (use-local-map (copy-keymap global-map))
+  (local-set-key "\C-cl" 'smbc-get-older)
+  (special-mode))
 
 (defun smbc-parse-html (html-page)
   "Parse the input HTML-PAGE for the comic image url."
