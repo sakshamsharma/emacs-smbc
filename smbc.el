@@ -39,12 +39,23 @@
   (interactive)
   (smbc-display-image (smbc-get-image-data (smbc-parse-html (smbc-get-index-page)))))
 
-(defun smbc-get-older ()
-  "Get a previous SMBC comic and display in BUFFER-NAME."
+(defun smbc-get-previous ()
+  "Get the previous SMBC comic and display in BUFFER-NAME."
   (interactive)
-  (smbc-display-in-buffer
-   (smbc-get-image-data
-    (smbc-parse-html (smbc-get-page-given-id "4134"))) smbc-buffer-name))
+  (let ((prev-id (int-to-string (- (string-to-int smbc-current-image-id) 1))))
+    (smbc-display-in-buffer
+     (smbc-get-image-data
+      (smbc-parse-html (smbc-get-page-given-id prev-id))) smbc-buffer-name)
+    (setq smbc-current-image-id prev-id)))
+
+(defun smbc-get-next ()
+  "Get the succeeding SMBC comic and display in BUFFER-NAME. Fails if currently latest."
+  (interactive)
+  (let ((next-id (int-to-string (+ (string-to-int smbc-current-image-id) 1))))
+    (smbc-display-in-buffer
+     (smbc-get-image-data
+      (smbc-parse-html (smbc-get-page-given-id next-id))) smbc-buffer-name)
+    (setq smbc-current-image-id next-id)))
 
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
@@ -78,7 +89,8 @@
   (erase-buffer)
   (insert-image (create-image image-data nil t))
   (use-local-map (copy-keymap global-map))
-  (local-set-key "\C-cl" 'smbc-get-older)
+  (local-set-key "\C-cp" 'smbc-get-previous)
+  (local-set-key "\C-cn" 'smbc-get-next)
   (special-mode))
 
 (defun smbc-parse-html (html-page)
@@ -93,6 +105,17 @@
   "Retrieve a part of the index page of SMBC."
   (let ((buffer (url-retrieve-synchronously
                  "http://smbc-comics.com")))
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (search-forward "buythisimg")
+      (let ((urlline (thing-at-point 'line)))
+        (while (string-match ".*id%3D"
+                             urlline)
+          (setq urlline (replace-match "" t t urlline)))
+        (while (string-match "\">.*"
+                             urlline)
+          (setq urlline (replace-match "" t t urlline)))
+        (setq smbc-current-image-id (smbc-chomp urlline))))
     (with-current-buffer buffer
       (goto-char (point-min))
       (search-forward "comics/../comics")
