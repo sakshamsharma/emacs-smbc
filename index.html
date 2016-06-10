@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Emacs-smbc by sakshamsharma</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Emacs-smbc</h1>
+        <h2>Read SMBC from inside Emacs!</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/sakshamsharma/emacs-smbc/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/sakshamsharma/emacs-smbc/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/sakshamsharma/emacs-smbc" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a id="emacs-smbc" class="anchor" href="#emacs-smbc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Emacs-SMBC</h1>
+
+<p>The fun (and the copyright) credits go to <a href="http://smbc-comics.com/">SMBC</a> of course!</p>
+
+<p>Emacs-SMBC is an Emacs plugin to help you (Save the world? Sadly no) read SMBC without leaving your Emacs!</p>
+
+<p>It is planned to have a lot of functions to make reading SMBC easier.</p>
+
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation:</h3>
+
+<p>If you don't have Melpa configured already, put this in your <code>.emacs</code> or <code>init.el</code>:</p>
+
+<div class="highlight highlight-source-lisp"><pre>(<span class="pl-k">when</span> (&gt;= emacs-major-version <span class="pl-c1">24</span>)
+  (require 'package)
+  (add-to-list
+   'package-archives
+   '(<span class="pl-s"><span class="pl-pds">"</span>melpa<span class="pl-pds">"</span></span> . <span class="pl-s"><span class="pl-pds">"</span>http://melpa.org/packages/<span class="pl-pds">"</span></span>)
+   <span class="pl-c1">t</span>)
+  (package-initialize))</pre></div>
+
+<p>Then follow it up with <code>M-x package-install</code> and enter <code>smbc</code> in the following prompt.</p>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>Simply load the file (place it in your <code>.emacs.d</code> and load it, or else use <code>M-x load-file</code> and give its path).<br>
+Better still, add it to your <code>init.el</code>, it's easy and fast to load.</p>
+
+<p>Access the latest comic with <code>M-x smbc-get-latest</code>.</p>
+
+<h3>
+<a id="misc" class="anchor" href="#misc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Misc</h3>
+
+<p>On MELPA as <code>smbc</code> <a href="https://github.com/sakshamsharma/melpa/blob/master/recipes/smbc">here</a></p>
+
+<p>Reddit discussion <a href="https://www.reddit.com/r/emacs/comments/4lrjln/a_simple_smbc_viewer_for_emacs/">here</a></p>
+
+<h3>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TODO</h3>
+
+<ul>
+<li>Check for new comics every time on startup</li>
+<li>Allow reading previous comics as well</li>
+<li>Cache last few comics</li>
+<li>Allow opening comic in browser</li>
+<li>Use RSS feed instead of parsing HTML</li>
+<li>Read some more SMBC <g-emoji alias="smile" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f604.png">😄</g-emoji>
+</li>
+</ul>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
