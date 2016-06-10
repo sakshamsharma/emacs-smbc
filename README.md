@@ -27,6 +27,8 @@ Better still, add it to your `init.el`, it's easy and fast to load.
 
 Access the latest comic with `M-x smbc-get-latest`.
 
+View the previous comic with `C-c p` inside the smbc buffer, or go forward one using `C-c n`.
+
 ### Misc
 On MELPA as `smbc` [here](https://github.com/sakshamsharma/melpa/blob/master/recipes/smbc)
 
