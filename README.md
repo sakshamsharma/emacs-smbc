@@ -37,7 +37,6 @@ Reddit discussion [here](https://www.reddit.com/r/emacs/comments/4lrjln/a_simple
 ### TODO
 
 * Check for new comics every time on startup
-* Allow reading previous comics as well
 * Cache last few comics
 * Allow opening comic in browser
 * Use RSS feed instead of parsing HTML
