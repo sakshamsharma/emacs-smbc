@@ -66,7 +66,7 @@
 (defun smbc-get-image-data (image-id)
   "Retrieve image data from smbc-comics.com/IMAGE-ID."
   (let ((buffer (url-retrieve-synchronously
-                 (concat "http://smbc-comics.com/" image-id))))
+                 (concat "http://www.smbc-comics.com/comics/" image-id))))
     (with-current-buffer buffer
       (goto-char (point-min))
       (search-forward "\n\n")
@@ -97,9 +97,9 @@
   "Parse the input HTML-PAGE for the comic image url."
   (smbc-chomp (let ((index html-page))
                 (replace-regexp-in-string
-                 "\" id=\"comic.*" ""
+                 "\" id=\"cc-comic.*" ""
                  (replace-regexp-in-string
-                  ".*src=\"comics/\.\./" "" index)))))
+                  ".*src=\"http://www.smbc-comics.com/comics/" "" index)))))
 
 (defun smbc-get-index-page ()
   "Retrieve a part of the index page of SMBC."
@@ -118,7 +118,7 @@
         (setq smbc-current-image-id (smbc-chomp urlline))))
     (with-current-buffer buffer
       (goto-char (point-min))
-      (search-forward "comics/../comics")
+      (search-forward ".com/comics/")
       (thing-at-point 'line))))
 
 (defun smbc-get-page-given-id (id)
