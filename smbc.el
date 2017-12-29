@@ -28,11 +28,9 @@
 ;; along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Code:
+(require 'dom)
 (require 'url)
-
-;; TODO Shift to using an XML parser for rss.php file of smbc
-;; Currently not doing that since it will make it hard to adapt
-;; for a comic which does not have such a feed
+(require 'xml)
 
 (defun smbc-get-latest ()
   "Get latest SMBC comic and display in new buffer."
@@ -40,37 +38,37 @@
   (smbc-display-image (smbc-get-image-data (smbc-parse-html (smbc-get-index-page)))))
 
 (defun smbc-get-previous ()
-  "Get the previous SMBC comic and display in BUFFER-NAME."
+  "Get the previous SMBC comic and display in the SMBC buffer."
   (interactive)
-  (let ((prev-id (int-to-string (- (string-to-int smbc-current-image-id) 1))))
-    (smbc-display-in-buffer
-     (smbc-get-image-data
-      (smbc-parse-html (smbc-get-page-given-id prev-id))) smbc-buffer-name)
-    (setq smbc-current-image-id prev-id)))
+  (if smbc-previous-url
+      (smbc-display-in-buffer
+       (smbc-get-image-data
+        (smbc-parse-html (smbc-retrieve smbc-previous-url))) smbc-buffer-name)
+    (message "No previous comic.")))
 
 (defun smbc-get-next ()
-  "Get the succeeding SMBC comic and display in BUFFER-NAME. Fails if currently latest."
+  "Get the succeeding SMBC comic and display in the SMBC buffer."
   (interactive)
-  (let ((next-id (int-to-string (+ (string-to-int smbc-current-image-id) 1))))
-    (smbc-display-in-buffer
-     (smbc-get-image-data
-      (smbc-parse-html (smbc-get-page-given-id next-id))) smbc-buffer-name)
-    (setq smbc-current-image-id next-id)))
+  (if smbc-next-url
+      (smbc-display-in-buffer
+       (smbc-get-image-data
+        (smbc-parse-html (smbc-retrieve smbc-next-url))) smbc-buffer-name)
+    (message "No next comic.")))
 
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
   (interactive
-   (list (read-string "Image ID (smbc-comics.com/): ")))
-  (smbc-get-image image-id))
+   (list (read-string "Image ID (smbc-comics.com/comic/): ")))
+  (smbc-display-image
+   (smbc-get-image-data
+    (smbc-parse-html
+     (smbc-retrieve
+      (url-expand-file-name image-id "http://smbc-comics.com/comic/"))))))
 
-(defun smbc-get-image-data (image-id)
-  "Retrieve image data from smbc-comics.com/IMAGE-ID."
-  (let ((buffer (url-retrieve-synchronously
-                 (concat "http://www.smbc-comics.com/comics/" image-id))))
-    (with-current-buffer buffer
-      (goto-char (point-min))
-      (search-forward "\n\n")
-      (buffer-substring (point) (point-max)))))
+(defun smbc-get-image-data (url)
+  "Retrieve image data from URL."
+  (with-current-buffer (smbc-retrieve url)
+    (buffer-string)))
 
 (defun smbc-display-image (image-data)
   "Create new buffer for IMAGE-DATA and then display."
@@ -86,56 +84,56 @@
       (switch-to-buffer buffer-name)
     (switch-to-buffer-other-window buffer-name))
   (read-only-mode 0)
-  (erase-buffer)
-  (insert-image (create-image image-data nil t))
+  (save-excursion
+    (erase-buffer)
+    (when smbc-current-title
+      (insert (propertize smbc-current-title 'face 'info-title-1) "\n"))
+    (insert-image (create-image image-data nil t))
+    (when smbc-current-alt
+      (insert "\n" (propertize smbc-current-alt 'face 'italic)))
+    (when smbc-after-image-url
+      (insert "\n")
+      (insert-image
+       (create-image (smbc-get-image-data smbc-after-image-url) nil t))))
   (use-local-map (copy-keymap global-map))
   (local-set-key "\C-cp" 'smbc-get-previous)
   (local-set-key "\C-cn" 'smbc-get-next)
   (special-mode))
 
-(defun smbc-parse-html (html-page)
-  "Parse the input HTML-PAGE for the comic image url."
-  (smbc-chomp (let ((index html-page))
-                (replace-regexp-in-string
-                 "\" id=\"cc-comic.*" ""
-                 (replace-regexp-in-string
-                  ".*src=\"http://www.smbc-comics.com/comics/" "" index)))))
+(defun smbc-parse-html (buffer)
+  "Parse the document in BUFFER."
+  (with-current-buffer buffer
+    (let ((dom (libxml-parse-html-region (point-min) (point-max))))
+      (let ((title (dom-by-tag dom 'title))
+            (comic (dom-by-id dom "^cc-comic$"))
+            (after-comic (dom-by-id dom "^aftercomic$"))
+            (prev (dom-by-class dom "^prev$"))
+            (next (dom-by-class dom "^next$")))
+        (setq smbc-previous-url (when prev (dom-attr prev 'href))
+              smbc-next-url (when next (dom-attr next 'href))
+              smbc-current-title (when title (dom-text title))
+              smbc-current-alt (when comic (dom-attr comic 'title))
+              smbc-after-image-url (when after-comic
+                                     (replace-regexp-in-string " " "%20"
+                                       (dom-attr
+                                        (dom-child-by-tag after-comic 'img)
+                                        'src))))
+        (when comic
+          (replace-regexp-in-string " " "%20" (dom-attr comic 'src)))))))
 
 (defun smbc-get-index-page ()
-  "Retrieve a part of the index page of SMBC."
-  (let ((buffer (url-retrieve-synchronously
-                 "http://smbc-comics.com")))
-    (with-current-buffer buffer
-      (goto-char (point-min))
-      (search-forward "buythisimg")
-      (let ((urlline (thing-at-point 'line)))
-        (while (string-match ".*id%3D"
-                             urlline)
-          (setq urlline (replace-match "" t t urlline)))
-        (while (string-match "\">.*"
-                             urlline)
-          (setq urlline (replace-match "" t t urlline)))
-        (setq smbc-current-image-id (smbc-chomp urlline))))
-    (with-current-buffer buffer
-      (goto-char (point-min))
-      (search-forward ".com/comics/")
-      (thing-at-point 'line))))
+  "Retrieve the index page of SMBC."
+  (smbc-retrieve "/"))
 
-(defun smbc-get-page-given-id (id)
-  "Retrieve part of a page with given ID to be used as a GET parameter."
+(defun smbc-retrieve (path-or-url)
+  "Retrieve a comic page for SMBC."
   (let ((buffer (url-retrieve-synchronously
-                 (concat "http://smbc-comics.com/index.php?id=" id))))
+                 (url-expand-file-name path-or-url "http://smbc-comics.com/"))))
     (with-current-buffer buffer
       (goto-char (point-min))
-      (search-forward "comics/../comics")
-      (thing-at-point 'line))))
-
-(defun smbc-chomp (str)
-  "Chomp leading and tailing whitespace from STR."
-  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
-                       str)
-    (setq str (replace-match "" t t str)))
-  str)
+      (search-forward "\n\n")
+      (delete-region (point-min) (point))
+      buffer)))
 
 (provide 'smbc)
 ;;; smbc.el ends here
