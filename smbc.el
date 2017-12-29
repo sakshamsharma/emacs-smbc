@@ -81,7 +81,11 @@
     (switch-to-buffer-other-window buffer-name))
   (read-only-mode 0)
   (erase-buffer)
+  (when smbc-current-title
+    (insert (propertize smbc-current-title 'face 'info-title-1) "\n"))
   (insert-image (create-image image-data nil t))
+  (when smbc-current-alt
+    (insert "\n" (propertize smbc-current-alt 'face 'italic)))
   (use-local-map (copy-keymap global-map))
   (local-set-key "\C-cp" 'smbc-get-previous)
   (local-set-key "\C-cn" 'smbc-get-next)
@@ -91,11 +95,14 @@
   "Parse the document in BUFFER."
   (with-current-buffer buffer
     (let ((dom (libxml-parse-html-region (point-min) (point-max))))
-      (let ((comic (dom-by-id dom "^cc-comic$"))
+      (let ((title (dom-by-tag dom 'title))
+            (comic (dom-by-id dom "^cc-comic$"))
             (prev (dom-by-class dom "^prev$"))
             (next (dom-by-class dom "^next$")))
         (setq smbc-previous-url (when prev (dom-attr prev 'href))
-              smbc-next-url (when next (dom-attr next 'href)))
+              smbc-next-url (when next (dom-attr next 'href))
+              smbc-current-title (when title (dom-text title))
+              smbc-current-alt (when comic (dom-attr comic 'title)))
         (when comic
           (replace-regexp-in-string " " "%20" (dom-attr comic 'src)))))))
 
