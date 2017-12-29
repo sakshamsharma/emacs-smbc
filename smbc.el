@@ -58,8 +58,12 @@
 (defun smbc-get-image-from-image-id (image-id)
   "Fetch image from SMBC, given the IMAGE-ID."
   (interactive
-   (list (read-string "Image ID (smbc-comics.com/): ")))
-  (smbc-get-image image-id))
+   (list (read-string "Image ID (smbc-comics.com/comic/): ")))
+  (smbc-display-image
+   (smbc-get-image-data
+    (smbc-parse-html
+     (smbc-retrieve
+      (url-expand-file-name image-id "http://smbc-comics.com/comic/"))))))
 
 (defun smbc-get-image-data (url)
   "Retrieve image data from URL."
