@@ -80,12 +80,13 @@
       (switch-to-buffer buffer-name)
     (switch-to-buffer-other-window buffer-name))
   (read-only-mode 0)
-  (erase-buffer)
-  (when smbc-current-title
-    (insert (propertize smbc-current-title 'face 'info-title-1) "\n"))
-  (insert-image (create-image image-data nil t))
-  (when smbc-current-alt
-    (insert "\n" (propertize smbc-current-alt 'face 'italic)))
+  (save-excursion
+    (erase-buffer)
+    (when smbc-current-title
+      (insert (propertize smbc-current-title 'face 'info-title-1) "\n"))
+    (insert-image (create-image image-data nil t))
+    (when smbc-current-alt
+      (insert "\n" (propertize smbc-current-alt 'face 'italic))))
   (use-local-map (copy-keymap global-map))
   (local-set-key "\C-cp" 'smbc-get-previous)
   (local-set-key "\C-cn" 'smbc-get-next)
