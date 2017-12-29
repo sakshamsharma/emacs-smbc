@@ -90,7 +90,11 @@
       (insert (propertize smbc-current-title 'face 'info-title-1) "\n"))
     (insert-image (create-image image-data nil t))
     (when smbc-current-alt
-      (insert "\n" (propertize smbc-current-alt 'face 'italic))))
+      (insert "\n" (propertize smbc-current-alt 'face 'italic)))
+    (when smbc-after-image-url
+      (insert "\n")
+      (insert-image
+       (create-image (smbc-get-image-data smbc-after-image-url) nil t))))
   (use-local-map (copy-keymap global-map))
   (local-set-key "\C-cp" 'smbc-get-previous)
   (local-set-key "\C-cn" 'smbc-get-next)
@@ -102,12 +106,18 @@
     (let ((dom (libxml-parse-html-region (point-min) (point-max))))
       (let ((title (dom-by-tag dom 'title))
             (comic (dom-by-id dom "^cc-comic$"))
+            (after-comic (dom-by-id dom "^aftercomic$"))
             (prev (dom-by-class dom "^prev$"))
             (next (dom-by-class dom "^next$")))
         (setq smbc-previous-url (when prev (dom-attr prev 'href))
               smbc-next-url (when next (dom-attr next 'href))
               smbc-current-title (when title (dom-text title))
-              smbc-current-alt (when comic (dom-attr comic 'title)))
+              smbc-current-alt (when comic (dom-attr comic 'title))
+              smbc-after-image-url (when after-comic
+                                     (replace-regexp-in-string " " "%20"
+                                       (dom-attr
+                                        (dom-child-by-tag after-comic 'img)
+                                        'src))))
         (when comic
           (replace-regexp-in-string " " "%20" (dom-attr comic 'src)))))))
 
